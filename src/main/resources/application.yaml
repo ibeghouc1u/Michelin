@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: michelin
+  datasource:
+    url: jdbc:h2:./michelin;AUTO_SERVER=TRUE
+    driver-class-name: org.h2.Driver
+    username: root
+    password: root
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    defer-datasource-initialization: true
+  h2:
+    console:
+      enabled: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://keycloak.bober.ovh/realms/master
+          jwk-set-uri: https://keycloak.bober.ovh/realms/master/protocol/openid-connect/certs
+
+s3:
+  url: https://s3.bober.ovh
+  access-key-id: cqBlF80IVJrc1isWW6oK
+  secret-key: KPJlY826Qi0d952w4GWmQIvA0zfvWi62hvIyiZlT
+  bucket-restaurant: restaurant
+  bucket-evaluation: evaluation
