@@ -52,7 +52,6 @@ public class SecurityConfig {
             public Collection<GrantedAuthority> convert(Jwt jwt) {
                 Set<String> extractedRoles = new HashSet<>();
 
-                
                 Map<String, Object> realmAccess = jwt.getClaim("realm_access");
                 if (realmAccess != null && realmAccess.get("roles") instanceof Collection<?> roles) {
                     for (Object role : roles) {
@@ -60,7 +59,6 @@ public class SecurityConfig {
                     }
                 }
 
-                
                 Map<String, Object> resourceAccess = jwt.getClaim("resource_access");
                 if (resourceAccess != null) {
                     for (Object clientObj : resourceAccess.values()) {
@@ -75,8 +73,9 @@ public class SecurityConfig {
                 return extractedRoles.stream()
                         .map(role -> (GrantedAuthority) new SimpleGrantedAuthority("ROLE_" + role))
                         .collect(Collectors.toSet());
-           
+            }
+        });
 
-    
-     }
+        return converter;
+    }
 }
