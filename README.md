@@ -1,6 +1,5 @@
 # Guide Michelin - API REST Backend
 
-**Projet de Développement Web Services (Master 2)**  
 **Réalisé par :** IBEGHOUCHENE Juba  
 
 ---
