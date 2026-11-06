@@ -107,7 +107,7 @@ Lors du test de l'upload direct avec le client Bruno, j'ai rencontré l'erreur s
 </Error>
 ```
 
-**Analyse du problème :**  
+**Analyse du problème :(hypothèse personnelle, non confirmée à 100 %)**  
 En analysant les requêtes, j'ai constaté que lorsque l'on colle l'URL présignée dans Bruno, celui-ci découpe automatiquement les paramètres dans son onglet *Params* et ré-encode les caractères déjà encodés (par exemple en transformant les `%2F` de `X-Amz-Credential` en `%252F`). De plus, Bruno conservait parfois par héritage le header `Authorization: Bearer <token>`, ce qui provoquait un conflit de signature chez MinIO.
 
 **Validation réussie via le Terminal :**  
