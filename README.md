@@ -1,17 +1,16 @@
 # Guide Michelin - API REST Backend
 
-**Projet de Développement Web Services (Master 2)**  
 **Réalisé par :** IBEGHOUCHENE Juba  
 
 ---
 
-## 📌 Présentation du Projet
+##  Présentation du Projet
 
 Ce projet consiste en la réalisation d'une API REST complète pour un guide gastronomique type "Guide Michelin". L'application permet de gérer des restaurants, d'ajouter des avis et des évaluations avec notes, de calculer automatiquement la moyenne des étoiles, de rechercher des avis par mots-clés, de stocker des photos dans un stockage objet distant, et de sécuriser les accès via OpenID Connect (Keycloak).
 
 ---
 
-## 🛠️ Technologies Utilisées
+##  Technologies Utilisées
 
 * **Java 21** & **Spring Boot 3 / 4** (Spring Web, Spring Data JPA, Spring Security, Spring Validation)
 * **H2 Database** : Base de données locale relationnelle avec console H2.
@@ -24,38 +23,21 @@ Ce projet consiste en la réalisation d'une API REST complète pour un guide gas
 
 ---
 
-## 📖 Documentation de l'API (Swagger UI)
+## Documentation de l'API (Swagger UI)
 
 Lorsque l'application est lancée localement, la documentation OpenAPI interactive est directement accessible dans le navigateur aux adresses suivantes :
 
 * **Interface Swagger UI :** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
-* **Spécification OpenAPI (JSON) :** [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
-
-L'interface Swagger permet de voir la liste exhaustive des routes, les statuts HTTP retournés (200, 201, 204, 400, 403, 404), ainsi que la structure exacte des DTOs en entrée et en sortie.
-
 ---
 
-## 📸 Captures d'Écran des Tests Bruno
+##  Captures d'Écran des Tests Bruno
 
 Pour prouver le bon fonctionnement de toutes les routes de l'API, j'ai réalisé une série complète de tests avec **Bruno**.  
-L'endroit idéal pour stocker ces preuves dans le dépôt Git est le dossier :  
+j'ai stocker les capturs d'écran dans le dossier :  
 📂 **`docs/screenshots/`**
 
-Vous y trouverez les captures des tests suivants :
-1. `01-create-restaurant-admin-201.png` : Création d'un restaurant avec le compte ADMIN Noël (201 Created).
-2. `02-create-restaurant-user-forbidden-403.png` : Refus de création d'un restaurant par Lucien USER (403 Forbidden).
-3. `03-get-restaurant-moyenne-minus-one.png` : Vérification de la moyenne à `-1.0` si le restaurant n'a pas d'avis.
-4. `04-add-evaluation-user-201.png` : Ajout d'une évaluation par Lucien avec note et commentaire (201 Created).
-5. `05-get-restaurant-calculated-moyenne.png` : Calcul dynamique de la moyenne après plusieurs avis.
-6. `06-lucene-search-evaluations.png` : Recherche plein texte de commentaires via Apache Lucene.
-7. `07-get-my-evaluations.png` : Route `GET /evaluations/me` retournant uniquement les avis de l'utilisateur connecté.
-8. `08-delete-evaluation-forbidden-403.png` : Refus de suppression de l'avis d'autrui sans être admin (403 Forbidden).
-9. `09-s3-presigned-url-generation.png` : Génération du lien d'upload S3 pour la photo.
-10. `10-s3-upload-curl-success-200.png` : Upload réussi de l'image du tiramisu avec réponse HTTP 200 OK.
 
----
-
-## 🏗️ Choix d'Architecture et Explications par Couche
+## Choix d'Architecture et Explications par Couche
 
 J'ai structuré l'application selon une architecture 3-tiers standard, en respectant les bonnes pratiques vues en cours.
 
@@ -107,7 +89,7 @@ J'ai créé un intercepteur d'erreurs avec `@RestControllerAdvice` qui capture l
 
 ---
 
-## ☁️ Fonctionnalité Stockage d'Images S3 (MinIO)
+##  Fonctionnalité Stockage d'Images S3 (MinIO)
 
 Conformément à ce qui a été expliqué en cours, j'ai fait le choix de **ne pas faire "passe-plat"** avec l'API Spring Boot (ce qui surchargerait la mémoire et la bande passante du serveur).  
 J'ai donc mis en place l'architecture par **URLs présignées** :
@@ -116,7 +98,7 @@ J'ai donc mis en place l'architecture par **URLs présignées** :
 3. L'API stocke le lien permanent final dans l'entité en base H2.
 4. Le client effectue un `HTTP PUT` directement vers le serveur MinIO pour déposer le fichier binaire.
 
-### ⚠️ Problème rencontré avec Bruno lors de l'upload et résolution :
+###  Problème rencontré avec Bruno lors de l'upload et résolution :
 Lors du test de l'upload direct avec le client Bruno, j'ai rencontré l'erreur suivante renvoyée par MinIO :
 ```xml
 <Error>
@@ -125,7 +107,7 @@ Lors du test de l'upload direct avec le client Bruno, j'ai rencontré l'erreur s
 </Error>
 ```
 
-**Analyse du problème :**  
+**Analyse du problème :(hypothèse personnelle, non confirmée à 100 %)**  
 En analysant les requêtes, j'ai constaté que lorsque l'on colle l'URL présignée dans Bruno, celui-ci découpe automatiquement les paramètres dans son onglet *Params* et ré-encode les caractères déjà encodés (par exemple en transformant les `%2F` de `X-Amz-Credential` en `%252F`). De plus, Bruno conservait parfois par héritage le header `Authorization: Bearer <token>`, ce qui provoquait un conflit de signature chez MinIO.
 
 **Validation réussie via le Terminal :**  
@@ -142,36 +124,6 @@ Ce test a confirmé à 100% que l'URL présignée générée par mon service Jav
 
 ---
 
-## 🧪 Tests Unitaires
 
-J'ai couvert la logique métier avec des tests unitaires Mockito / JUnit 5 dans `src/test/java/` :
-* **`RestaurantServiceTest`** :
-  * Cas limite : vérification que la moyenne renvoie `-1.0` si le restaurant n'a aucun avis.
-  * Calcul mathématique de la moyenne avec plusieurs avis.
-  * Levée de l'exception 404 si le restaurant n'existe pas.
-  * Création et mise à jour de restaurant.
-* **`EvaluationServiceTest`** :
-  * Ajout d'évaluation et appel de l'indexation Lucene.
-  * Contrôle de sécurité : l'auteur peut supprimer son avis, un utilisateur non-admin reçoit une `AccessDeniedException`.
-  * Filtre de "mes évaluations" par `authorId`.
 
-Pour lancer l'ensemble des tests :
-```powershell
-.\mvnw.cmd test
-```
-
----
-
-## 🚀 Démarrage du Projet
-
-```powershell
-# Cloner le dépôt et se placer dans le projet
-cd Michelin
-
-# Lancer l'application
-.\mvnw.cmd spring-boot:run
-```
-L'API démarre sur le port `8080`.
-Console H2 disponible sur : `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:./michelin`, user: `root`, password: `root`).
-Documentation Swagger disponible sur : `http://localhost:8080/swagger-ui.html`.
 
